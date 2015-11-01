@@ -3,23 +3,35 @@ from time import sleep
 
 
 class Feld(object):
-    def __init__(self, farbe, x_koordinate, y_koordinate, schon_besucht):
-        self.farbe = farbe
-        self.x_koordinate = x_koordinate
-        self.y_koordinate = y_koordinate
-        self.schon_besucht = schon_besucht
+    def __init__(self, farbe, x_koordinate, y_koordinate, schon_besucht, kassi_steht, mute=0):
 
-        print(type(schon_besucht))
-        print("Hallo ich bin ein neues Feld der Farbe ", farbe, ", meine Koordinaten sind ", x_koordinate, "/",
-              y_koordinate, sep="")
+        self.farbe = farbe                      # Feldfarbe
+        self.x_koordinate = x_koordinate        # X-Koordinate
+        self.y_koordinate = y_koordinate        # Y-Koordinate
+        self.schon_besucht = schon_besucht      # War Kassi schon hier?
+        self.kassi_steht = kassi_steht          # Steht Kassi im Moment hier?
+
+        #
+        # Konsoleninfo: Objekt wurde erstellt!
+        if not mute:
+            print("Neues Feld: Farbe ", farbe, ", Koordinaten X:", x_koordinate, " Y:",
+                  y_koordinate, sep="")
 
 
 def einlesen_datei(dateiname):
+    # Datei versuchsweise oeffnen und versuchen, den Inhalt zeilenweise zu lesen
+    # Inhalt ist eine Liste von Strings
     try:
         datei = open(dateiname, "r")
-        inhalt = datei.read()
+        inhalt = datei.readlines()
+        datei.close()
+
+        for index, line in enumerate(inhalt):
+            inhalt[index] = line.rstrip()
 
         return inhalt
+
+    # Datei wurde nicht gefunden (Vermutlich falscher Name angegeben)
     except FileNotFoundError:
         print("Diese Datei kenne ich nicht.")
         sleep(3)
@@ -27,25 +39,32 @@ def einlesen_datei(dateiname):
 
 
 def verarbeiten_datei(inhalt):
-    x = int(inhalt[0])      # X-Koordinate auslesen, diese steht an erster Stelle
-    y = int(inhalt[2])      # Y-Koordinate auslesen, folgt auf erste Stelle  + ein Leerzeichen
+    # Ziel ist es, jedes ausgelesene Zeichen in ein Objekt der Klasse Feld
+    # umzuwandeln. Diese Objekte sollen in der Liste liste_neue_felder gespeichert werden.
+    liste_neue_felder = []
 
-    while inhalt[0] is not "#":         # Alle Newlines und Leerzeichen entfernen bis zum Beginn der
-        inhalt = inhalt[1:len(inhalt)]      # eigentlichen Felder
+    # Feldgroesse - WIRD IM MOMENT NICHT BEACHTET!
+    x_groesse = inhalt[0][0]
+    y_groesse = inhalt[0][2]
 
-    zeilen = []             # Einzelne Zeilen der Datei in einer Liste
-    aktuelle_zeile = ""         # Eine Zeile dieser Liste
+    # Zeile, die die Groesseninformation enthaelt entfernen und Liste umkehren,
+    # damit der Koordinatenursprung im SuedWesten liegt
+    inhalt = inhalt[1:len(inhalt)]
+    inhalt = list(reversed(inhalt))
 
-    while len(inhalt) != 0:                 # Solange wir noch nicht am Ende der Datei sind
-        if not inhalt[0] == "\n":           # Falls das aktuelle Zeichen nicht den Anfang einer neuen Zeile symbolisiert
-            aktuelle_zeile += inhalt[0]     # Erweitere die aktuelle Zeile um das Zeichen
-        else:                               #
-            zeilen.append(aktuelle_zeile)
-            aktuelle_zeile = ""
-        inhalt = inhalt[1:len(inhalt)]
+    # Fuer jedes Zeichen in jeder Zeile soll ein Objekt angelegt werden
+    for index_zeile, zeile in enumerate(inhalt):
+        for index_zeichen, zeichen in enumerate(zeile):
+            if zeichen is "#":
+                farbe = "s"
+            else:
+                farbe = "w"
 
-    for zeile in zeilen:
-        print(zeile)
+            if zeichen is "K":
+                kassi_steht = 1
+            else:
+                kassi_steht = 0
 
-
-
+            # Erstelle neues Objekt. X-Koord. ist der Index des Zeichens in der Zeile (von links),
+            # Y-Koord ist Nummer der Zeile (von unten).
+            liste_neue_felder.append(Feld(farbe, index_zeichen, index_zeile, 0, kassi_steht, 1))
