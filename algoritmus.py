@@ -1,5 +1,14 @@
 import copy
 
+
+def finde_anzahl_weisse_felder(objektliste):
+    anzahl_weisse = 0
+    for objekt in objektliste:
+        if objekt.farbe == "w":
+            anzahl_weisse += 1
+    return anzahl_weisse
+
+
 def finde_kassi(objektliste):
     for item in objektliste:
         if item.kassi_steht:
@@ -9,11 +18,9 @@ def finde_kassi(objektliste):
 
 def suche_verbindungen(objektliste, aktuelles_feld):
     # Verbindungen können im N,S,W oder O sein!
-
     liste_verbundener_felder = []  # Eine Liste aller weissen Felder die an das
     # untersuchte Feld angrenzen und noch nicht als verbunden erkannt
     # wurden
-
     for objekt in objektliste:
         if objekt.objektkoordinaten in aktuelles_feld.nachbarkoordinaten:
             # Das angeschaute Objekt ist ein Nachbar des untersuchten Feldes
@@ -22,7 +29,6 @@ def suche_verbindungen(objektliste, aktuelles_feld):
                 objekt.printinfo("(In)direkte Verbindung zu Kassi: ")
                 objekt.verbunden = 1
                 liste_verbundener_felder.append(objekt)
-
     return liste_verbundener_felder
 
 
@@ -38,10 +44,7 @@ def verbindungstest(objektliste):
     anzahl_verbundene = 1 + len(verbundene_felder)
 
     # Wir finden heraus wie viele weisse Felder es insgesamt in Quadratien gibt
-    anzahl_weisse = 0
-    for objekt in objektliste:
-        if objekt.farbe == "w":
-            anzahl_weisse += 1
+    anzahl_weisse = finde_anzahl_weisse_felder(objektliste)
 
     # So lange wir noch neue verbundene Felder finden
     while len(verbundene_felder) != 0:
@@ -60,21 +63,20 @@ def verbindungstest(objektliste):
         verbundene_felder = neu_gefundene  # Die neu gefundenen werden wieder zu den verbundenen feldern
         # und die Suche kann weitergehen
 
-    print("Es gibt " + str(anzahl_weisse) + " weisse Felder, davon sind " + str(
-        anzahl_verbundene) + " miteinander verbunden!")
+   # print("Es gibt " + str(anzahl_weisse) + " weisse Felder, davon sind " + str(
+   #     anzahl_verbundene) + " miteinander verbunden!")
 
     if anzahl_weisse == anzahl_verbundene:
-        print("Somit sind alle weissen Felder fuer Kassi erreichbar!")
+     #   print("Somit sind alle weissen Felder fuer Kassi erreichbar!")
+        return 1
     else:
-        print("Kassi kann nicht alle weissen Felder erreichen :-(")
+     #   print("Kassi kann nicht alle weissen Felder erreichen :-(")
+        return 0
 
         # besuchte felder werden zu stein - jedes mal neu erreichbarkeit aller felder pruefen!
 
 
 def kassi_bewedi(objektliste, kassi_anfang, kassi_ende):
-
-
-
     kopierte_objektliste = copy.deepcopy(objektliste)
 
     for index, item in enumerate(kopierte_objektliste):
@@ -84,55 +86,31 @@ def kassi_bewedi(objektliste, kassi_anfang, kassi_ende):
             kopierte_objektliste[index].schon_besucht = 1
         if item.objektkoordinaten == kassi_ende.objektkoordinaten:
             kopierte_objektliste[index].kassi_steht = 1
-            kopierte_objektliste[index].farbe = "s"
+            #kopierte_objektliste[index].farbe = "s"
             kopierte_objektliste[index].schon_besucht = 1
 
     return kopierte_objektliste
 
 
+def unverbind(liste):
+    for index, item in enumerate(liste):
+        liste[index].verbunden = 0
+
+
 def kassi_finde_weg(objektliste):
-    stammbaum = {}
-    loesungen = []
-    anzahl_weisse = 0
-    for objekt in objektliste:
-        if objekt.farbe == "w":
-            anzahl_weisse += 1
+    zustaende = [objektliste]
 
-    zustaende = [copy.deepcopy(objektliste)]
+    for zustandsnr, zustand in enumerate(zustaende):
+        unverbind(zustand)
+        if not verbindungstest(zustand):
+            #print("Kassi hat sich den Weg in Zustand " + str(zustandsnr) + " versperrt.")
+            continue
+        unverbind(zustand)
+        moegliche_ziele = suche_verbindungen(zustand, finde_kassi(zustand))
 
-    for index, zustand in enumerate(zustaende):
-
-        for i, item in enumerate(zustand):
-            zustand[i].verbunden = 0
-
-        kassi_ausgangspunkt = finde_kassi(zustand)
-        reisemoeglichkeiten = suche_verbindungen(zustand, kassi_ausgangspunkt)
-
-        for moeglichkeit in reisemoeglichkeiten:
-            zustand = kassi_bewedi(zustand, kassi_ausgangspunkt, moeglichkeit)
-            zustaende.append(zustand)
-            stammbaum[index] = len(zustaende)-1
-            print("Vaterzustand " + str(index) + " zeugte Zustand " + str(len(zustaende)-1))
-
-            schon_besuchte = 0
-            for feld in zustand:
-                if feld.schon_besucht == 1:
-                    schon_besuchte += 1
-            if schon_besuchte == anzahl_weisse:
-                loesungen.append(index)
-                print(str(index) + "loest das Problem")
-                from time import sleep
-                sleep(1)
-    print(stammbaum)
-
-    return loesungen, stammbaum
-
-
-
-
-
-
-
+        for ziel in moegliche_ziele:
+            neuer_zustand = kassi_bewedi(zustand, finde_kassi(zustand), ziel)
+            zustaende.append(neuer_zustand)
 
 
 
