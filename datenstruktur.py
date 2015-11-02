@@ -1,6 +1,8 @@
 from sys import exit
 from time import sleep
 
+still = 0
+
 
 class Feld(object):
     def __init__(self, farbe, x_koordinate, y_koordinate, schon_besucht, kassi_steht, mute=0):
@@ -10,12 +12,23 @@ class Feld(object):
         self.y_koordinate = y_koordinate        # Y-Koordinate
         self.schon_besucht = schon_besucht      # War Kassi schon hier?
         self.kassi_steht = kassi_steht          # Steht Kassi im Moment hier?
+        self.verbunden = 0
+        self.mute = mute
+
+        self.nordkords = [x_koordinate, y_koordinate + 1]
+        self.ostkords = [x_koordinate + 1, y_koordinate]
+        self.suedkords = [x_koordinate, y_koordinate - 1]
+        self.westkords = [x_koordinate - 1, y_koordinate]
+        self.nachbarliste = [self.nordkords, self.ostkords, self.suedkords, self.westkords]
 
         #
         # Konsoleninfo: Objekt wurde erstellt!
-        if not mute:
-            print("Neues Feld: Farbe ", farbe, ", Koordinaten X:", x_koordinate, " Y:",
-                  y_koordinate, sep="")
+        self.printinfo("Neues Feld: ")
+
+    def printinfo(self, zusatz="", still_override=0):
+        if not self.mute or still_override:
+            print(zusatz + "Farbe ", self.farbe, ", Koordinaten X:", self.x_koordinate, " Y:",
+                self.y_koordinate, sep="")
 
 
 def einlesen_datei(dateiname):
@@ -67,4 +80,6 @@ def verarbeiten_datei(inhalt):
 
             # Erstelle neues Objekt. X-Koord. ist der Index des Zeichens in der Zeile (von links),
             # Y-Koord ist Nummer der Zeile (von unten).
-            liste_neue_felder.append(Feld(farbe, index_zeichen, index_zeile, 0, kassi_steht, 1))
+            liste_neue_felder.append(Feld(farbe, index_zeichen, index_zeile, 0, kassi_steht, still))
+
+    return liste_neue_felder
