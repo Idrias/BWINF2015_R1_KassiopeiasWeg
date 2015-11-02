@@ -1,27 +1,9 @@
 import datenstruktur
 import algoritmus
-import fenster
-from time import sleep
-from threading import *
 
-datenstruktur.still = 0
+datenstruktur.still = 1
 
-def abc():
-    algoritmus.verbindungstest(liste_der_felder)
-    sleep(1)
-
-
-inhalt_datei = datenstruktur.einlesen_datei("kassiopeia7.txt")
+inhalt_datei = datenstruktur.einlesen_datei("kassiopeia5.txt")
 liste_der_felder = datenstruktur.verarbeiten_datei(inhalt_datei)
-
-a = Thread(target = abc)
-a.start()
-
-
-fenster.build_window(liste_der_felder)
-
-
-
-
-
-
+algoritmus.verbindungstest(liste_der_felder)
+algoritmus.kassi_finde_weg(liste_der_felder)

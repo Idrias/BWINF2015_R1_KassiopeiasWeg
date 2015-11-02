@@ -1,7 +1,8 @@
 from tkinter import *
 from threading import *
 
-root = Tk()
+
+
 
 def mach_blau(item):
     new_button = Button()
@@ -10,7 +11,7 @@ def mach_blau(item):
 
 
 def build_window(liste_der_felder):
-    global root
+    root = Tk()
     root.geometry("700x600")
 
     for x in range(50):
@@ -19,7 +20,7 @@ def build_window(liste_der_felder):
         Grid.rowconfigure(root, y, weight=1)
 
     for item in liste_der_felder:
-        new_button = Button()
+        new_button = Button(command=main.abc)
         new_button.config(text=str(item.x_koordinate) + " " + str(item.y_koordinate))
 
         if item.farbe == "s":
@@ -27,7 +28,8 @@ def build_window(liste_der_felder):
         if item.kassi_steht:
             new_button.config(bg="green")
 
-        new_button.grid(sticky=N+S+E+W, row=(item.y_koordinate-6)*-1, column=item.x_koordinate)
+        from datenstruktur import y_groesse
+        new_button.grid(sticky=N+S+E+W, row=(item.y_koordinate-y_groesse)*-1, column=item.x_koordinate)
 
     root.mainloop()
 
