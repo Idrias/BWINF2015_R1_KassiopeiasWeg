@@ -1,5 +1,6 @@
 from sys import exit
 from time import sleep
+from fenster import zeige_nachricht
 
 still = 0
 x_groesse = 0
@@ -51,6 +52,7 @@ def einlesen_datei(dateiname):
     # Datei wurde nicht gefunden (Vermutlich falscher Name angegeben)
     except FileNotFoundError:
         print("Diese Datei kenne ich nicht.")
+        zeige_nachricht("Unbekannte Datei", "Tut mir leid, aber diese Datei gibts nicht!")
         sleep(3)
         exit()
 

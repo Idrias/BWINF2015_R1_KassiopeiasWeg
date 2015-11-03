@@ -128,7 +128,7 @@ def kassi_finde_weg(objektliste):
         if not verbindungstest(0, zustand):
             print("U2 " + str(zustandsnr))
             print("Kassi hat sich den Weg in Zustand " + str(zustandsnr) + " versperrt.")
-            #continue
+            continue
         print("U3 " + str(zustandsnr))
         unverbind(zustand)
         print("U4 " + str(zustandsnr))
@@ -176,14 +176,25 @@ def kassi_finde_weg(objektliste):
                 if item.kassi_steht:
                     letztes_objekt = item
 
-            himmelsrichtungen = ""
-            for item in list(reversed(history)):
+            for item in objektliste:
+                if item.kassi_steht:
+                    fenster.mach_farbe("yellow", item)
+                elif item.farbe == "w":
+                    fenster.mach_farbe("light green", item)
+            sleep(0.8)
+
+            for item in list(reversed(history)):    # For zustand im verlauf
                 for thing in zustaende[item]:
+                    pass
+
+            himmelsrichtungen = ""
+            for item in list(reversed(history)):    # For zustand im verlauf
+                for thing in zustaende[item]:       # For feld in diesem zustand
                     if thing.kassi_steht:
                         fenster.mach_farbe("yellow", thing)
                         fenster.mach_farbe("gray", letztes_objekt)
 
-                        #sleep(0.5)
+                        sleep(0.1)
                         if thing.objektkoordinaten == letztes_objekt.nordkords:
                             himmelsrichtungen += " N "
                         elif thing.objektkoordinaten == letztes_objekt.ostkords:

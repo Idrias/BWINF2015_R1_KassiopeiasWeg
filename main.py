@@ -6,8 +6,9 @@ import time
 
 datenstruktur.still = 1
 
+dateiname = fenster.erstelle_fragefenster()
 # Datein einlesen & verarbeiten
-inhalt_datei = datenstruktur.einlesen_datei("kassiopeiaEXP.txt")
+inhalt_datei = datenstruktur.einlesen_datei(dateiname)
 liste_der_felder = datenstruktur.verarbeiten_datei(inhalt_datei)
 
 

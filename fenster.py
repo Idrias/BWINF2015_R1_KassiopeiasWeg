@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import messagebox
 y_feld = 0
+entrytext = ""
 
 def zeige_nachricht(titel, text):
     messagebox.showinfo(titel, text)
@@ -10,6 +11,25 @@ def mach_farbe(farbe, item):
     new_button = Button()
     new_button.config(text=str(item.x_koordinate) + " " + str(item.y_koordinate), bg=farbe)
     new_button.grid(sticky=N+S+E+W, row=(item.y_koordinate- y_feld)*-1, column=item.x_koordinate)
+
+def zerstoere(entry, root):
+    print("ping")
+    global entrytext
+    entrytext = entry.get()
+    root.destroy()
+
+def erstelle_fragefenster():
+     root = Tk()
+     root.geometry("205x90")
+     root.config(background="light green")
+     Label(text=" Bitte geben sie den Dateinamen ein:", background="light green").grid(row=0, column=0)
+     m_entry = Entry()
+     m_entry.grid(row=1, column=0)
+     Label(background="light green").grid(row=2, column=0)
+     Button(text="Los gehts!",command= lambda: zerstoere(m_entry, root)).grid(row=3, column=0)
+     root.mainloop()
+     print(entrytext)
+     return entrytext
 
 
 def erstelle_fenster(liste_der_felder):
