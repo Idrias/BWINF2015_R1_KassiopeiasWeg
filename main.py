@@ -4,10 +4,10 @@ import fenster
 import threading
 import time
 
-datenstruktur.still = 0
+datenstruktur.still = 1
 
 # Datein einlesen & verarbeiten
-inhalt_datei = datenstruktur.einlesen_datei("kassiopeia3.txt")
+inhalt_datei = datenstruktur.einlesen_datei("kassiopeiaEXP.txt")
 liste_der_felder = datenstruktur.verarbeiten_datei(inhalt_datei)
 
 
