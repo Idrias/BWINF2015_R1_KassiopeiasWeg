@@ -1,4 +1,8 @@
 import copy
+import fenster
+import datenstruktur
+from time import sleep
+from sys import exit
 
 
 def finde_anzahl_weisse_felder(objektliste):
@@ -17,7 +21,7 @@ def finde_kassi(objektliste):
 
 
 def suche_verbindungen(objektliste, aktuelles_feld):
-    # Verbindungen können im N,S,W oder O sein!
+    # Verbindungen kï¿½nnen im N,S,W oder O sein!
     liste_verbundener_felder = []  # Eine Liste aller weissen Felder die an das
     # untersuchte Feld angrenzen und noch nicht als verbunden erkannt
     # wurden
@@ -32,13 +36,16 @@ def suche_verbindungen(objektliste, aktuelles_feld):
     return liste_verbundener_felder
 
 
-def verbindungstest(objektliste):
+def verbindungstest(farbe, objektliste):
     aktuelles_feld = finde_kassi(objektliste)  # Wir beginnen unsere Suche auf Kassis aktuellen Feld
     aktuelles_feld.verbunden = 1  # Dieses ist natuerlich verbunden
 
     # Wir finden heraus, welche weissen Felder mit Kassis Feld verbunden sind, die noch nicht als verbunden
     # erkannt wurden
     verbundene_felder = suche_verbindungen(objektliste, aktuelles_feld)
+    for feld in verbundene_felder:
+        if farbe: fenster.mach_farbe("light green", feld)
+
 
     # Kassis Feld selbst ist verbunden, dazu alle jetzt neu gefundenen verbundenen Felder
     anzahl_verbundene = 1 + len(verbundene_felder)
@@ -53,10 +60,12 @@ def verbindungstest(objektliste):
         neu_gefundene = []
 
         # Fuer jedes der eben gefundenen Felder wird widerum eine Untersuchung auf unbekannte, weisse
-        # Nachbarfelder durchgeführt
+        # Nachbarfelder durchgefï¿½hrt
         for feld in verbundene_felder:
+            if farbe: fenster.mach_farbe("light green", feld)
             aktuelles_feld = feld
             neu_gefundene += suche_verbindungen(objektliste, aktuelles_feld)
+        if farbe: sleep(0.0)
 
         anzahl_verbundene += len(neu_gefundene)  # Anzahl der insgesamt verbundenen weissen Felder wird
         # entsprechend erhoeht
@@ -67,10 +76,11 @@ def verbindungstest(objektliste):
    #     anzahl_verbundene) + " miteinander verbunden!")
 
     if anzahl_weisse == anzahl_verbundene:
-     #   print("Somit sind alle weissen Felder fuer Kassi erreichbar!")
+        if farbe: fenster.zeige_nachricht("Super!", "Alle weissen Felder sind fÃ¼r Kassi erreichbar.")
         return 1
     else:
-     #   print("Kassi kann nicht alle weissen Felder erreichen :-(")
+        if farbe: fenster.zeige_nachricht("Schade", "Kassi kann leider nicht alle Felder erreichen. :-(")
+        exit()
         return 0
 
         # besuchte felder werden zu stein - jedes mal neu erreichbarkeit aller felder pruefen!
@@ -84,9 +94,10 @@ def kassi_bewedi(objektliste, kassi_anfang, kassi_ende):
             kopierte_objektliste[index].kassi_steht = 0
             kopierte_objektliste[index].farbe = "s"
             kopierte_objektliste[index].schon_besucht = 1
+            #fenster.mach_farbe("black", item)
+
         if item.objektkoordinaten == kassi_ende.objektkoordinaten:
             kopierte_objektliste[index].kassi_steht = 1
-            #kopierte_objektliste[index].farbe = "s"
             kopierte_objektliste[index].schon_besucht = 1
 
     return kopierte_objektliste
@@ -99,18 +110,71 @@ def unverbind(liste):
 
 def kassi_finde_weg(objektliste):
     zustaende = [objektliste]
+    vaterliste = []
+    kindliste = []
+    loesungen = []
+    history = []
 
     for zustandsnr, zustand in enumerate(zustaende):
         unverbind(zustand)
-        if not verbindungstest(zustand):
-            #print("Kassi hat sich den Weg in Zustand " + str(zustandsnr) + " versperrt.")
+        if not verbindungstest(0, zustand):
+            print("Kassi hat sich den Weg in Zustand " + str(zustandsnr) + " versperrt.")
             continue
         unverbind(zustand)
         moegliche_ziele = suche_verbindungen(zustand, finde_kassi(zustand))
 
         for ziel in moegliche_ziele:
+            print(ziel.objektkoordinaten)
             neuer_zustand = kassi_bewedi(zustand, finde_kassi(zustand), ziel)
             zustaende.append(neuer_zustand)
+            vaterliste.append(zustandsnr)
+            kindliste.append(len(zustaende) - 1)
+
+        print(finde_anzahl_weisse_felder(zustand))
+        if finde_anzahl_weisse_felder(zustand) == 1:
+            print(zustandsnr)
+            print("Keine weissen Felder verbleibend!")
+            print(vaterliste)
+            print(kindliste)
+            print()
+
+            gesuchte_nummer = zustandsnr
+            gesucht = "kind"
+
+            #while gesuchte_nummer != 0:
+            for vaternummer, kindnummer in zip(reversed(vaterliste), reversed(kindliste)):
+                if vaternummer == gesuchte_nummer and gesucht == "vater":
+                    gesuchte_nummer = kindnummer
+                    gesucht = "kind"
+                    history.append(vaternummer)
+                if kindnummer == gesuchte_nummer and gesucht == "kind":
+                    gesuchte_nummer = vaternummer
+                    gesucht = "kind"
+                    history.append(kindnummer)
+            loesungen.append(history)
+
+            for item in zustaende[0]:
+                if item.kassi_steht:
+                    letztes_objekt = item
+
+            for item in list(reversed(history)):
+                for thing in zustaende[item]:
+                    if thing.kassi_steht:
+                        fenster.mach_farbe("yellow", thing)
+                        fenster.mach_farbe("gray", letztes_objekt)
+                        letztes_objekt = thing
+                        sleep(0.0)
+            history = []
+
+
+
+
+
+    #print(history)
+
+
+
+
 
 
 

@@ -1,15 +1,23 @@
 import datenstruktur
-import algoritmus
+import algorithmus
 import fenster
+import threading
+import time
 
-datenstruktur.still = 1
+datenstruktur.still = 0
 
 # Datein einlesen & verarbeiten
-inhalt_datei = datenstruktur.einlesen_datei("kassiopeia0.txt")
+inhalt_datei = datenstruktur.einlesen_datei("kassiopeia3.txt")
 liste_der_felder = datenstruktur.verarbeiten_datei(inhalt_datei)
-#fenster.build_window(liste_der_felder)
 
 
-# Algoritmen zur Loesung der Aufgabenstellungen
-algoritmus.verbindungstest(liste_der_felder)
-algoritmus.kassi_finde_weg(liste_der_felder)
+def algorithmus_funktion():
+    # Algorithmen zur Loesung der Aufgabenstellungen
+    time.sleep(0.5)
+    algorithmus.verbindungstest(1, liste_der_felder)
+    algorithmus.kassi_finde_weg(liste_der_felder)
+
+
+algorithmen_task = threading.Thread(target=algorithmus_funktion)
+algorithmen_task.start()
+fenster.erstelle_fenster(liste_der_felder)

@@ -89,3 +89,11 @@ def verarbeiten_datei(inhalt):
             liste_neue_felder.append(Feld(farbe, index_zeichen, index_zeile, 0, kassi_steht))
 
     return liste_neue_felder
+
+"""
+class Loesung(object):
+    def __init__(self):
+        pass
+
+def loesung_aufbereiten(zustaende, zustandsnr, vaterliste, kindliste):
+    pass"""
